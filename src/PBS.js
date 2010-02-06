@@ -16,5 +16,52 @@ PBS.namespace = function(ns){
 } // PBS.namespace
 PBS.ns = PBS.namespace;
 
+PBS.Class = function(){};
+PBS.Class.prototype = {
+    init: function(options) {
+        jQuery.extend(this, options);
+        jQuery(document).ready(function(){
+            this.initDOM();
+            this.initEvents();
+        })
+     }
+};
+
+var initializing = false;
+
+PBS.Class.subclass = function(properties) {
+    var superclass = this.prototype; 
+
+    // Instantiating base class
+    initializing = true;
+    var prototype = new this();
+    initializing = false;
+
+    // Overwrite stuff in prototype with stuff from properties
+    for (var name in properties) {
+        var prop = properties[name];
+        if (typeof(prop) === 'function') {
+            prototype[name] = function() {
+                return prop.apply(this, arguments);
+            }
+        } else {
+            prototype[name] = prop;
+        }
+    }
+
+    prototype.superclass = superclass;
+
+    function Class() {
+        if (!initializing && this.init) {
+            this.init.apply(this, arguments);
+        }
+    }
+
+    Class.prototype = prototype;
+    Class.constructor = Class;
+    Class.subclass = arguments.callee;
+    
+    return Class;
+}
 
 })() // End local namespace
