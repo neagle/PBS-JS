@@ -1,0 +1,32 @@
+<html>
+<head>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.0/jquery.min.js"></script>
+<script type="text/javascript" src="pbsjs-debug.js"></script>
+</head>
+
+<body>
+<h1>Test</h1>
+
+<script>
+
+var _fname = /^function (\W*)(\w*)/;
+
+function _get_fname() {
+    var f = arguments.callee.caller.caller.toString()
+    return f.match(_fname)[2] ;
+}
+
+function log(expression) {
+    var result = (expression) ? 'PASS':'FAIL';
+    console.log(_get_fname(), result);
+}
+function test_namespace() {
+    PBS.namespace('pbs.namespace_test');
+    log(pbs.namespace_test);
+}
+test_namespace()
+
+</script>
+
+</body>
+</html>

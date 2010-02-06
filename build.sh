@@ -1,12 +1,14 @@
 #!/bin/bash
 
+WORKDIR=`dirname $0`
+
 SRCFILES="PBS.js Bridge.js"
 
 NAME="pbsjs"
-INPUTDIRECTORY="src"
+INPUTDIRECTORY="$WORKDIR/src"
 
-DEBUG="$NAME-debug.js"
-MINIFIED="$NAME-min.js"
+DEBUG="$WORKDIR/$NAME-debug.js"
+MINIFIED="$WORKDIR/$NAME-min.js"
 
 # Remove outputfile if it already exists
 rm -f $DEBUG
@@ -18,4 +20,4 @@ do
 done
 
 # Create minified version
-java -jar lib/yuicompressor-2.4.2.jar $DEBUG -o $MINIFIED
+java -jar $WORKDIR/lib/yuicompressor-2.4.2.jar $DEBUG -o $MINIFIED
