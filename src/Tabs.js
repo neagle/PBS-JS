@@ -66,20 +66,31 @@ PBS.Tabs = PBS.Class.subclass({
             container: null,
             defaultTab: null,
             removeLabel: false,
-            tabContent: '.tabContent',
+            tabPanes: '.tabContent',
             tabLabel: 'h3'
         }
         jQuery.extend(settings, options);
         // After adding custom settings, call base class init
-        PBS.Tabs.superclass.init.call(this, settings);
+        console.log('checking');
+        // PBS.Tabs.superclass.init.call(this, settings);
     },
     //private
     initDOM: function(){
+        console.log('initdom');
+        // Create tabs
+        this.createTabs();
 
+        
     },
     //private
     initEvents: function(){
 
+    },
+
+    createTabs: function(){
+        var tabs = [];
+        // Populate tab array with the text from the tab label elements
+        console.log(this.settings);
     }
 });
 

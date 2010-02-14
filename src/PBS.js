@@ -19,6 +19,7 @@ PBS.ns = PBS.namespace;
 PBS.Class = function(){};
 PBS.Class.prototype = {
     init: function(options) {
+        console.log('init');
         jQuery.extend(this, options);
         jQuery(document).ready(function(){
             this.initDOM();
@@ -52,7 +53,9 @@ PBS.Class.subclass = function(properties) {
     prototype.superclass = superclass;
 
     function Class() {
+        console.log('This from inside Class(): ', this);
         if (!initializing && this.init) {
+            console.log('Running init...');
             this.init.apply(this, arguments);
         }
     }
