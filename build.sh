@@ -2,7 +2,7 @@
 
 WORKDIR=`dirname $0`
 
-SRCFILES="PBS.js Bridge.js"
+SRCFILES="PBS.js Bridge.js Tabs.js"
 
 NAME="pbsjs"
 INPUTDIRECTORY="$WORKDIR/src"
