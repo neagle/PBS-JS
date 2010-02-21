@@ -8,12 +8,14 @@ PBS.Tabs = PBS.Class.subclass({
             speedOpen: 'fast',
             tabControls: null,
             tabControlsClass: 'tabControls',
+            // Call this content elements to make a common nomenclature for
+            // multiple classes? (contentEl)
             tabPanes: '.tabContent',
             tabLabel: 'h3',
             // Ask Ian about making transition configurable
             transitionClose: null, 
             transitionOpen: null
-        }
+        };
         jQuery.extend(settings, options);
         // After adding custom settings, call base class init
         this.superclass.init.call(this, settings);
@@ -23,12 +25,15 @@ PBS.Tabs = PBS.Class.subclass({
     //private
     initDOM: function(){
         // Create tabs
+        this.superclass.initDOM.call(this);
         this.createTabControls();
         this.prepareTabPanes();
     },
     //private
     initEvents: function(){
         // Create Change Event
+        // this.tabControl.bind('change', this.changeTab);
+        this.superclass.initEvents.call(this);
         this.tabControls.bind('change', jQuery.proxy(function(e) {
             var tab = jQuery(e.target),
                 pane = jQuery(tab.parent().data('pane'));
@@ -55,8 +60,15 @@ PBS.Tabs = PBS.Class.subclass({
         // Create Click Event
         this.tabControls.find('a').click(function(e){
             jQuery(e.target).trigger('change', [e]);
+            jQuery(e.target).parent().trigger('click', [e]);
             return false;
         });
+
+        PBS.noLinkAnchorClickEvent = function(e, func){
+            func(jQuery(e.target));
+            jQuery(e).parent().trigger('click', []);
+            return false;
+        }
 
         // Hide all panes on page load
         this.tabPanes.hide().children('.inner').hide();
@@ -74,17 +86,17 @@ PBS.Tabs = PBS.Class.subclass({
         // Populate tab array with the text from the tab label elements
         this.tabPanes.each(function(i, item) {
             // Note: label must be a child (not just a decendant)
-            tabs.push(jQuery(item).children(tabLabel).text());
+            tabs.push(jQuery(item).children(tabLabel).first().text());
         });
 
         // Hide the labels if set to do so
-        if (this.removeLabels == true) {
-            this.tabPanes.children(this.tabLabel).remove();
-        };
+        if (this.removeLabels) {
+            this.tabPanes.children(tabLabel).remove();
+        }
 
         // Create UL for tabs
         this.tabControls = jQuery('<ul />', {
-            class: 'tabControls'
+            'class': 'tabControls'
         }).addClass(this.tabControlsClass);
 
         if (this.container == null) {
@@ -113,7 +125,7 @@ PBS.Tabs = PBS.Class.subclass({
         // Prevents margin collapsing
         this.tabPanes.children('.inner').css({
             overflow: 'hidden'
-        })
+        });
 
         // Set the height of the panes explicitly
         this.tabPanes.each(function(i, item) {

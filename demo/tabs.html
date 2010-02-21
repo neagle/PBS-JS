@@ -18,6 +18,10 @@
         cursor: pointer
     }
 
+    body.noOutlines .tabControls a {
+        outline: none;
+    }
+
     .tabControls2 {
         border-bottom: 5px solid rgb(99.6%, 90.2%, 30.2%);
         list-style-type: none;
@@ -130,6 +134,7 @@
 <script src="../src/Tabs.js"></script>
 <script type="text/javascript">
     var tabs1 = new PBS.Tabs({
+        container: '.container',
         tabPanes: '.tabs1'
     });
 
@@ -138,6 +143,20 @@
         tabControlsClass: 'tabControls2',
         tabPanes: '.tabs2'
     });
+
+$(document).ready(function() {
+    // Hasty implementation of a method for suppressing outlines of anchor tags
+    // on click, but revealing them when keyboard is used
+    $('body').addClass('noOutlines');
+    $(document).keypress(function(){
+        // console.log('key');
+        $('body').removeClass('noOutlines');
+    });
+    $(document).click(function(){
+        // console.log('click');
+        $('body').addClass('noOutlines');
+    });
+});
 </script>
 </body>
 </html>

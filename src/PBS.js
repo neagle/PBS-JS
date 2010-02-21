@@ -25,8 +25,11 @@ PBS.Class.prototype = {
             this.initEvents();
         }, this);
         jQuery(document).ready(lifeCycle);
-     }
+     },
+     initDOM: function(){},
+     initEvents: function(){}
 };
+
 
 var initializing = false;
 
