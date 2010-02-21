@@ -2,7 +2,7 @@
 
 WORKDIR=`dirname $0`
 
-SRCFILES="PBS.js Bridge.js Tabs.js"
+SRCFILES="PBS.js State.js Bridge.js Tabs.js"
 LIBFILES="jquery.cookie.js"
 
 NAME="pbsjs"
