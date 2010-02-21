@@ -3,10 +3,11 @@ PBS.Tabs = PBS.Class.subclass({
         var settings = {
             container: null,
             defaultTab: null,
-            removeLabel: false,
+            removeLabels: false,
             speedClose: 'fast',
             speedOpen: 'fast',
             tabControls: null,
+            tabControlsClass: 'tabControls',
             tabPanes: '.tabContent',
             tabLabel: 'h3',
             // Ask Ian about making transition configurable
@@ -29,12 +30,15 @@ PBS.Tabs = PBS.Class.subclass({
     initEvents: function(){
         // Create Change Event
         this.tabControls.bind('change', jQuery.proxy(function(e) {
-            var tab = jQuery(e.target).parent(),
-                pane = jQuery(tab.data('pane'));
+            var tab = jQuery(e.target),
+                pane = jQuery(tab.parent().data('pane'));
 
             if(!pane.hasClass('selected')) {
+                this.tabControls.find('a').removeClass('active');
+                tab.addClass('active');
+
                 // Close currently open pane
-                var selected = jQuery('.selected');
+                var selected = this.tabPanes.closest('.selected');
                 selected.children('.inner').slideUp(this.speedClose, function() {
                     selected.hide().removeClass('selected');
                     pane.show()
@@ -60,6 +64,7 @@ PBS.Tabs = PBS.Class.subclass({
         this.tabPanes.first().show()
             .addClass('selected')
             .children('.inner').show();
+        this.tabControls.find('a').first().addClass('active');
     },
 
     createTabControls: function(){
@@ -73,14 +78,14 @@ PBS.Tabs = PBS.Class.subclass({
         });
 
         // Hide the labels if set to do so
-        if (this.removeLabel == true) {
+        if (this.removeLabels == true) {
             this.tabPanes.children(this.tabLabel).remove();
         };
 
         // Create UL for tabs
         this.tabControls = jQuery('<ul />', {
             class: 'tabControls'
-        });
+        }).addClass(this.tabControlsClass);
 
         if (this.container == null) {
             // If no container is set, create tab controls before the 

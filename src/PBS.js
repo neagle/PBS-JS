@@ -19,10 +19,8 @@ PBS.ns = PBS.namespace;
 PBS.Class = function(){};
 PBS.Class.prototype = {
     init: function(options) {
-        console.log('Start class lifecycle');
         jQuery.extend(this, options);
         var lifeCycle = jQuery.proxy(function(){
-            console.log(this);
             this.initDOM();
             this.initEvents();
         }, this);
@@ -57,9 +55,7 @@ PBS.Class.subclass = function(properties) {
     prototype.superclass = superclass;
 
     function Class() {
-        console.log('This from inside Class(): ', this);
         if (!initializing && this.init) {
-            console.log('Running init...');
             this.init.apply(this, arguments);
         }
     }
