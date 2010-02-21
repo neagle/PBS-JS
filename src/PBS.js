@@ -19,12 +19,14 @@ PBS.ns = PBS.namespace;
 PBS.Class = function(){};
 PBS.Class.prototype = {
     init: function(options) {
-        console.log('init');
+        console.log('Start class lifecycle');
         jQuery.extend(this, options);
-        jQuery(document).ready(function(){
+        var lifeCycle = jQuery.proxy(function(){
+            console.log(this);
             this.initDOM();
             this.initEvents();
-        })
+        }, this);
+        jQuery(document).ready(lifeCycle);
      }
 };
 
@@ -42,9 +44,11 @@ PBS.Class.subclass = function(properties) {
     for (var name in properties) {
         var prop = properties[name];
         if (typeof(prop) === 'function') {
-            prototype[name] = function() {
-                return prop.apply(this, arguments);
-            }
+            prototype[name] = (function(fn){
+                return function() {
+                    return fn.apply(this, arguments);
+                }
+            })(prop);
         } else {
             prototype[name] = prop;
         }

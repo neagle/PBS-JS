@@ -1,96 +1,120 @@
-/*
-
-<div class="tabContent">
-
-    <h3>This is my tab label</h3>
-
-    <p>There's some content in here.</p>
-
-</div><!-- end .tabContent -->
-
-<div class="tabContent">
-</div>
-
-<div class="tabContent">
-</div>
-
-var MyNewClass = Ext.extend(MyOldClass, {
-    construtor: function()
-});
-
- */
-/*
-        extend = function(){
-            // inline overrides
-            var io = function(o){
-                for(var m in o){
-                    this[m] = o[m];
-                }
-            };
-            var oc = Object.prototype.constructor;
-
-            return function(sb, sp, overrides){
-                if(Ext.isObject(sp)){
-                    overrides = sp;
-                    sp = sb;
-                    sb = overrides.constructor != oc ? overrides.constructor : function(){sp.apply(this, arguments);};
-                }
-                var F = function(){},
-                    sbp,
-                    spp = sp.prototype;
-
-                F.prototype = spp;
-                sbp = sb.prototype = new F();
-                sbp.constructor=sb;
-                sb.superclass=spp;
-                if(spp.constructor == oc){
-                    spp.constructor=sp;
-                }
-                sb.override = function(o){
-                    Ext.override(sb, o);
-                };
-                sbp.superclass = sbp.supr = (function(){
-                    return spp;
-                });
-                sbp.override = io;
-                Ext.override(sb, overrides);
-                sb.extend = function(o){return Ext.extend(sb, o);};
-                return sb;
-            };
-        }(),
-        */
-
 PBS.Tabs = PBS.Class.subclass({
     init: function(options){
         var settings = {
             container: null,
             defaultTab: null,
             removeLabel: false,
+            speedClose: 'fast',
+            speedOpen: 'fast',
+            tabControls: null,
             tabPanes: '.tabContent',
-            tabLabel: 'h3'
+            tabLabel: 'h3',
+            // Ask Ian about making transition configurable
+            transitionClose: null, 
+            transitionOpen: null
         }
         jQuery.extend(settings, options);
         // After adding custom settings, call base class init
-        console.log('checking');
-        // PBS.Tabs.superclass.init.call(this, settings);
+        this.superclass.init.call(this, settings);
+
+        this.tabPanes = jQuery(this.tabPanes);
     },
     //private
     initDOM: function(){
-        console.log('initdom');
         // Create tabs
-        this.createTabs();
-
-        
+        this.createTabControls();
+        this.prepareTabPanes();
     },
     //private
     initEvents: function(){
+        // Create Change Event
+        this.tabControls.bind('change', jQuery.proxy(function(e) {
+            var tab = jQuery(e.target).parent(),
+                pane = jQuery(tab.data('pane'));
 
+            if(!pane.hasClass('selected')) {
+                // Close currently open pane
+                var selected = jQuery('.selected');
+                selected.children('.inner').slideUp(this.speedClose, function() {
+                    selected.hide().removeClass('selected');
+                    pane.show()
+                        .addClass('selected')
+                        .children('.inner').slideDown(this.speedOpen, function(){
+                            // Reserved for anything that needs to happen at
+                            // the end 
+                        });
+                });
+            }
+            
+        }, this)); 
+        
+        // Create Click Event
+        this.tabControls.find('a').click(function(e){
+            jQuery(e.target).trigger('change', [e]);
+            return false;
+        });
+
+        // Hide all panes on page load
+        this.tabPanes.hide().children('.inner').hide();
+        // Show the first pane on page load
+        this.tabPanes.first().show()
+            .addClass('selected')
+            .children('.inner').show();
     },
 
-    createTabs: function(){
-        var tabs = [];
-        // Populate tab array with the text from the tab label elements
-        console.log(this.settings);
-    }
-});
+    createTabControls: function(){
+        var tabs = [],
+            tabLabel = this.tabLabel;
 
+        // Populate tab array with the text from the tab label elements
+        this.tabPanes.each(function(i, item) {
+            // Note: label must be a child (not just a decendant)
+            tabs.push(jQuery(item).children(tabLabel).text());
+        });
+
+        // Hide the labels if set to do so
+        if (this.removeLabel == true) {
+            this.tabPanes.children(this.tabLabel).remove();
+        };
+
+        // Create UL for tabs
+        this.tabControls = jQuery('<ul />', {
+            class: 'tabControls'
+        });
+
+        if (this.container == null) {
+            // If no container is set, create tab controls before the 
+            // first tabPane
+            this.tabControls.insertBefore(this.tabPanes[0]);
+        } else {
+            // If a container is set, prepend the controls to it 
+            this.tabControls.prependTo(this.container);
+        }
+        // Populate tab controls with tab <li>s
+        for (var i=tabs.length-1;i>=0;i--) {
+            jQuery('<li>', {
+                html: '<a href="#">' + tabs[i] + '</a>'
+            })
+                .prependTo(this.tabControls)
+                // Store a reference to the tab's pane
+                .data('pane', this.tabPanes[i]);
+        }
+    },
+
+    prepareTabPanes: function() {
+        // Add an inner wrapper to tab panes so that we can control pane
+        // heights and transition them nicely
+        this.tabPanes.wrapInner('<div class="inner"></div>');
+        // Prevents margin collapsing
+        this.tabPanes.children('.inner').css({
+            overflow: 'hidden'
+        })
+
+        // Set the height of the panes explicitly
+        this.tabPanes.each(function(i, item) {
+            var $item = jQuery(item);
+            $item.height($item.height() + 'px');
+        });
+    }
+
+});
